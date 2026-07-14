@@ -18,6 +18,7 @@ export default function LibraryScreen() {
   const filter = useStore((s) => s.filter);
   const setFilter = useStore((s) => s.setFilter);
   const openRecipe = useStore((s) => s.openRecipe);
+  const ings = useStore((s) => s.ings);
   const amounts = useStore((s) => s.amounts);
   const swapped = useStore((s) => s.swapped);
 
@@ -55,7 +56,7 @@ export default function LibraryScreen() {
 
       <ScrollView style={styles.list} contentContainerStyle={styles.listContent}>
         {recipes.map((r) => {
-          const m = macros(r.id, amounts, swapped);
+          const m = macros(ings[r.id], r.id, amounts, swapped);
           const th = THUMB[r.tag] ?? { bg: C.canvas, ink: C.sage };
           return (
             <Pressable key={r.id} onPress={() => openRecipe(r.id)} style={styles.card}>

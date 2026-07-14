@@ -27,10 +27,10 @@ export function resolveDef(rid: string, ingId: string, swapped: Swapped): Ingred
 }
 
 // Recipe totals: Σ per100 · grams/100. Per-serving = total / servings.
-export function macros(rid: string, amounts: Amounts, swapped: Swapped): MacroSet {
-  const r = getRecipe(rid);
+// `ingIds` is the recipe's current (mutable) ingredient list from the store.
+export function macros(ingIds: string[], rid: string, amounts: Amounts, swapped: Swapped): MacroSet {
   const t: MacroSet = { cal: 0, p: 0, c: 0, f: 0 };
-  for (const [ingId] of r.ings) {
+  for (const ingId of ingIds) {
     const a = amounts[rid][ingId];
     const d = resolveDef(rid, ingId, swapped);
     const k = a / 100;
@@ -43,11 +43,10 @@ export function macros(rid: string, amounts: Amounts, swapped: Swapped): MacroSe
 }
 
 // Per axis: clamp(round(50 + 58 · Σ(grams·coef)/Σgrams), 4, 100)
-export function texture(rid: string, amounts: Amounts, swapped: Swapped): TexVector {
-  const r = getRecipe(rid);
+export function texture(ingIds: string[], rid: string, amounts: Amounts, swapped: Swapped): TexVector {
   let mass = 0;
   const ax: TexVector = { chewy: 0, soft: 0, airy: 0, dense: 0 };
-  for (const [ingId] of r.ings) {
+  for (const ingId of ingIds) {
     const a = amounts[rid][ingId];
     const d = resolveDef(rid, ingId, swapped);
     mass += a;

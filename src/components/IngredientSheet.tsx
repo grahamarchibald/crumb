@@ -36,6 +36,7 @@ export default function IngredientSheet() {
   const swapped = useStore((s) => s.swapped);
   const setAmt = useStore((s) => s.setAmt);
   const toggleSwap = useStore((s) => s.toggleSwap);
+  const removeIngredient = useStore((s) => s.removeIngredient);
   const closeSheet = useStore((s) => s.closeSheet);
 
   const r = getRecipe(rid);
@@ -156,6 +157,11 @@ export default function IngredientSheet() {
               No lighter swap — {d.name.toLowerCase()} is already a wholesome pick.
             </Text>
           )}
+
+          <Pressable onPress={() => removeIngredient(rid, openId)} style={styles.removeBtn}>
+            <Text style={styles.removeGlyph}>−</Text>
+            <Text style={styles.removeLabel}>Remove from recipe</Text>
+          </Pressable>
         </ScrollView>
       </View>
     </>
@@ -325,4 +331,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginTop: 12,
   },
+
+  removeBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    marginTop: 22,
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderColor: C.negativePanel,
+    backgroundColor: C.negativePanel,
+  },
+  removeGlyph: { fontFamily: F.sans600, fontSize: 22, lineHeight: 24, color: C.clay },
+  removeLabel: { fontFamily: F.sans800, fontSize: 14, color: C.clay },
 });

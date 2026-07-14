@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import AddIngredientSheet from '../components/AddIngredientSheet';
 import IngredientSheet from '../components/IngredientSheet';
 import { AXES, MACROCOL } from '../data/defs';
 import { domTex, fmt, getRecipe, macros, resolveDef, texture } from '../domain/engine';
@@ -28,15 +29,19 @@ function TextureBar({ value, color }: { value: number; color: string }) {
 
 export default function BuilderScreen() {
   const activeId = useStore((s) => s.activeId)!;
+  const ings = useStore((s) => s.ings);
   const amounts = useStore((s) => s.amounts);
   const swapped = useStore((s) => s.swapped);
   const open = useStore((s) => s.open);
+  const adding = useStore((s) => s.adding);
   const back = useStore((s) => s.back);
   const openIng = useStore((s) => s.openIng);
+  const openAdd = useStore((s) => s.openAdd);
 
   const r = getRecipe(activeId);
-  const m = macros(activeId, amounts, swapped);
-  const tex = texture(activeId, amounts, swapped);
+  const ingList = ings[activeId];
+  const m = macros(ingList, activeId, amounts, swapped);
+  const tex = texture(ingList, activeId, amounts, swapped);
 
   const pcal = m.p * 4;
   const ccal = m.c * 4;
@@ -110,7 +115,7 @@ export default function BuilderScreen() {
           <Text style={styles.sectionMeta}>tap to tune or swap</Text>
         </View>
         <View style={styles.ingList}>
-          {r.ings.map(([ingId]) => {
+          {ingList.map((ingId) => {
             const d = resolveDef(activeId, ingId, swapped);
             const a = amounts[activeId][ingId];
             const kcal = (d.per100.cal * a) / 100 / r.servings;
@@ -133,10 +138,16 @@ export default function BuilderScreen() {
               </Pressable>
             );
           })}
+
+          <Pressable onPress={openAdd} style={styles.addRow}>
+            <Text style={styles.addPlus}>+</Text>
+            <Text style={styles.addLabel}>Add ingredient</Text>
+          </Pressable>
         </View>
       </ScrollView>
 
       {open != null && <IngredientSheet />}
+      {adding && <AddIngredientSheet />}
     </View>
   );
 }
@@ -229,4 +240,20 @@ const styles = StyleSheet.create({
   ingSub: { fontFamily: F.sans600, fontSize: 12, color: C.muted },
   ingAmount: { fontFamily: F.sans800, fontSize: 15, color: C.green },
   ingChevron: { fontSize: 22 },
+
+  addRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 16,
+    borderWidth: 1.5,
+    borderStyle: 'dashed',
+    borderColor: C.borderGreen,
+    backgroundColor: C.positivePanel,
+    marginTop: 4,
+  },
+  addPlus: { fontFamily: F.sans600, fontSize: 20, lineHeight: 22, color: C.green },
+  addLabel: { fontFamily: F.sans800, fontSize: 14, color: C.greenDark },
 });
